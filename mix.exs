@@ -1,28 +1,83 @@
 defmodule MembraneRpicamPlugin.MixProject do
   use Mix.Project
 
+  @version "0.1.0"
+  @github_url "https://github.com/membraneframework-labs/membrane_rpicam_plugin"
+
   def project do
     [
       app: :membrane_rpicam_plugin,
-      version: "0.1.0",
+      version: @version,
       elixir: "~> 1.15",
+      elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      dialyzer: dialyzer(),
+
+      # hex
+      description: "Membrane rpicam plugin",
+      package: package(),
+
+      # docs
+      name: "Membrane rpicam plugin",
+      source_url: @github_url,
+      homepage_url: "https://membrane.stream",
+      docs: docs()
     ]
   end
 
-  # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: []
     ]
   end
 
-  # Run "mix help deps" to learn about dependencies.
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_env), do: ["lib"]
+
   defp deps do
     [
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
+      {:membrane_core, "~> 1.0"},
+      {:membrane_h264_format, "~> 0.6.0"},
+      {:bunch, "~> 1.4"},
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
+      {:dialyxir, ">= 0.0.0", only: :dev, runtime: false},
+      {:credo, ">= 0.0.0", only: :dev, runtime: false}
+    ]
+  end
+
+  defp dialyzer() do
+    opts = [
+      flags: [:error_handling]
+    ]
+
+    if System.get_env("CI") == "true" do
+      # Store PLTs in cacheable directory for CI
+      [plt_local_path: "priv/plts", plt_core_path: "priv/plts"] ++ opts
+    else
+      opts
+    end
+  end
+
+  defp package do
+    [
+      maintainers: ["Membrane Team"],
+      licenses: ["Apache-2.0"],
+      links: %{
+        "GitHub" => @github_url,
+        "Membrane Framework Homepage" => "https://membrane.stream"
+      }
+    ]
+  end
+
+  defp docs do
+    [
+      main: "readme",
+      extras: ["README.md", "LICENSE"],
+      formatters: ["html"],
+      source_ref: "v#{@version}",
+      filter_modules: "Membrane\.Rpicam",
+      nest_modules_by_prefix: [Membrane.Rpicam]
     ]
   end
 end
