@@ -9,7 +9,7 @@ defmodule Membrane.RpicamPluginTest do
       child(:source, %Membrane.Rpicam.Source{timeout: 5000})
       |> child(:sink, %Membrane.File.Sink{location: "/data/output.h264"})
 
-    pipeline = Testing.Pipeline.start_link_supervised!(spec: spec)
+    pipeline = Membrane.Testing.Pipeline.start_link_supervised!(spec: spec)
 
     Process.sleep(1_000)
     assert Process.alive?(pipeline)

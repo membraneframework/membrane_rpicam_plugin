@@ -42,7 +42,8 @@ defmodule MembraneRpicamPlugin.MixProject do
       {:bunch, "~> 1.4"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:dialyxir, ">= 0.0.0", only: :dev, runtime: false},
-      {:credo, ">= 0.0.0", only: :dev, runtime: false}
+      {:credo, ">= 0.0.0", only: :dev, runtime: false},
+      {:membrane_file_plugin, "~> 0.16.0", only: :test}
     ]
   end
 
