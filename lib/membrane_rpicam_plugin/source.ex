@@ -45,6 +45,7 @@ defmodule Membrane.Rpicam.Source do
   @impl true
   def handle_playing(_ctx, state) do
     stream_format = %RemoteStream{type: :bytestream, content_format: H264}
+
     port = Port.open({:spawn, create_command(state)}, [:binary, :exit_status])
 
     {[stream_format: {:output, stream_format}], %{app_port: port, init_time: nil}}
@@ -54,6 +55,7 @@ defmodule Membrane.Rpicam.Source do
   def handle_info({port, {:data, data}}, _ctx, %{app_port: port} = state) do
     time = Membrane.Time.monotonic_time()
     init_time = state.init_time || time
+
     buffer = %Buffer{payload: data, pts: time - init_time}
 
     {[buffer: {:output, buffer}], %{state | init_time: init_time}}
