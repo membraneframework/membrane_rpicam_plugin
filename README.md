@@ -18,7 +18,7 @@ The package depends on rpicam-apps that need to be present on the target system.
 
 ## Usage
 
-The following pipeline captures 5 seconds from the RaspberryPi camera and saves it to `/data/output.h264`:
+The following script creates and starts a pipeline capturing 5 seconds from the RaspberryPi camera module and saving it to `/data/output.h264`:
 
 ```elixir
 defmodule Rpicam.Pipeline do
@@ -32,26 +32,28 @@ defmodule Rpicam.Pipeline do
 
     {[spec: spec], %{}}
   end
+
+  @impl true
+  def handle_element_end_of_stream(:sink, _pad, _ctx, state) do
+    {[terminate: :normal], state}
+  end
+
+  @impl true
+  def handle_element_end_of_stream(_child, _pad, _ctx, state) do
+    {[], state}
+  end
+end
+
+# Start and monitor the pipeline
+{:ok, _supervisor_pid, pipeline_pid} = Membrane.Pipeline.start_link(Rpicam.Pipeline)
+ref = Process.monitor(pipeline_pid)
+
+# Wait for the pipeline to finish
+receive do
+  {:DOWN, ^ref, :process, _pipeline_pid, _reason} ->
+    :ok
 end
 ```
-
-## Testing
-
-To run manual tests and verify them you need to have access to testing environment on your target device (not possible on Nerves).
-
-First, install dependendencies:
-
-```shell
-mix deps.get
-```
-
-Then run tests with manual tag: 
-
-```shell
-mix test --include manual
-```
-
-After 5 seconds `output.h264` file should be created in current working directory containing footage from the camera. You can play it with software like FFmpeg.
 
 ## Copyright and License
 
