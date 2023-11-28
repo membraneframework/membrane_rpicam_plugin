@@ -1,6 +1,6 @@
 # Membrane Rpicam Plugin
 
-Membrane Rpicam Plugin allows capturing video from official RaspberryPi camera module using [rpicam-apps](https://github.com/raspberry-pi/rpicam-apps).
+Membrane Rpicam Plugin allows capturing video from official RaspberryPi camera module using [rpicam-apps](https://github.com/raspberry-pi/rpicam-apps) (formerly libcamera-apps). This plugin can also be used on devices running [Nerves](https://nerves-project.org).
 
 ## Installation
 
@@ -14,7 +14,7 @@ def deps do
 end
 ```
 
-The package depends on rpicam-apps (formerly libcamera-apps) that need to be present on the target system.
+The package depends on rpicam-apps that need to be present on the target system.
 
 ## Usage
 
