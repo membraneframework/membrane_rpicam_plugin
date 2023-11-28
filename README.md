@@ -1,6 +1,6 @@
 # Membrane Rpicam Plugin
 
-Membrane Rpicam Plugin allows capturing video from RaspberryPi camera using [rpicam-apps](https://github.com/raspberry-pi/rpicam-apps).
+Membrane Rpicam Plugin allows capturing video from official RaspberryPi camera module using [rpicam-apps](https://github.com/raspberry-pi/rpicam-apps).
 
 ## Installation
 
@@ -13,6 +13,8 @@ def deps do
   ]
 end
 ```
+
+The package depends on rpicam-apps (formerly libcamera-apps) that need to be present on the target system.
 
 ## Usage
 
@@ -32,6 +34,24 @@ defmodule Rpicam.Pipeline do
   end
 end
 ```
+
+## Testing
+
+To run manual tests and verify them you need to have access to testing environment on your target device (not possible on Nerves).
+
+First, install dependendencies:
+
+```shell
+mix deps.get
+```
+
+Then run tests with manual tag: 
+
+```shell
+mix test --include manual
+```
+
+After 5 seconds `output.h264` file should be created in current working directory containing footage from the camera. You can play it with software like FFmpeg.
 
 ## Copyright and License
 

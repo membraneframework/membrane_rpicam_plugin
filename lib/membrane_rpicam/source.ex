@@ -10,33 +10,32 @@ defmodule Membrane.Rpicam.Source do
 
   def_output_pad :output,
     accepted_format: %RemoteStream{type: :bytestream, content_format: H264},
-    availability: :always,
     flow_control: :push
 
   def_options timeout: [
-                spec: non_neg_integer() | :infinity,
+                spec: Membrane.Time.non_neg() | :infinity,
                 default: :infinity,
                 description: """
                 Time for which program runs in milliseconds.
                 """
               ],
               framerate: [
-                spec: {pos_integer(), pos_integer()},
-                default: {-1, 1},
+                spec: {pos_integer(), pos_integer()} | :camera_default,
+                default: :camera_default,
                 description: """
                 Fixed framerate.
                 """
               ],
               width: [
-                spec: non_neg_integer(),
-                default: 0,
+                spec: pos_integer() | :camera_default,
+                default: :camera_default,
                 description: """
                 Output image width.
                 """
               ],
               height: [
-                spec: non_neg_integer(),
-                default: 0,
+                spec: pos_integer() | :camera_default,
+                default: :camera_default,
                 description: """
                 Output image height.
                 """
@@ -61,6 +60,7 @@ defmodule Membrane.Rpicam.Source do
     {[buffer: {:output, buffer}], %{state | init_time: init_time}}
   end
 
+  @impl true
   def handle_info({port, {:exit_status, exit_status}}, _ctx, %{app_port: port} = state) do
     if exit_status == 0 do
       {[end_of_stream: :output], state}
@@ -77,8 +77,19 @@ defmodule Membrane.Rpicam.Source do
         t when t >= 0 -> t
       end
 
-    framerate = elem(opts.framerate, 0) / elem(opts.framerate, 1)
+    {framerate_num, framerate_denom} = resolve_defaultable_option(opts.framerate, {-1, 1})
+    framerate_float = framerate_num / framerate_denom
 
-    "#{@app_name} -t #{timeout} --framerate #{framerate} --width #{opts.width} --height #{opts.height} -o -"
+    width = resolve_defaultable_option(opts.width, 0)
+    height = resolve_defaultable_option(opts.height, 0)
+
+    "#{@app_name} -t #{timeout} --framerate #{framerate_float} --width #{width} --height #{height} -o -"
+  end
+
+  defp resolve_defaultable_option(option, default) do
+    case option do
+      :camera_default -> default
+      x -> x
+    end
   end
 end
