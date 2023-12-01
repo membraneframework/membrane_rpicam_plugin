@@ -1,5 +1,9 @@
 # Membrane Rpicam Plugin
 
+[![Hex.pm](https://img.shields.io/hexpm/v/membrane_aac_plugin.svg)](https://hex.pm/packages/membrane_rpicam_plugin)
+[![API Docs](https://img.shields.io/badge/api-docs-yellow.svg?style=flat)](https://hexdocs.pm/membrane_rpicam_plugin)
+[![CircleCI](https://circleci.com/gh/membraneframework/membrane_aac_plugin.svg?style=svg)](https://circleci.com/gh/membraneframework/membrane_rpicam_plugin)
+
 Membrane Rpicam Plugin allows capturing video from official RaspberryPi camera module using [rpicam-apps](https://github.com/raspberry-pi/rpicam-apps) (formerly libcamera-apps). This plugin can also be used on devices running [Nerves](https://nerves-project.org).
 
 ## Installation
