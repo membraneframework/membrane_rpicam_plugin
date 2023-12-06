@@ -41,10 +41,21 @@ defmodule Membrane.Rpicam.Source do
                 description: """
                 Output image height.
                 """
+              ],
+              camera_open_delay: [
+                spec: Membrane.Time.non_neg(),
+                default: Membrane.Time.milliseconds(50),
+                description: """
+                Determines for how long initial opening the camera should be delayed.
+                No delay can cause a crash on Nerves system when initalizing the
+                element during the boot sequence of the device.
+                """
               ]
 
   @impl true
   def handle_init(_ctx, options) do
+    Process.sleep(options.camera_open_delay)
+
     stream_format = %RemoteStream{type: :bytestream, content_format: H264}
 
     state = %{
@@ -74,10 +85,10 @@ defmodule Membrane.Rpicam.Source do
       exit_status == 0 ->
         {[end_of_stream: :output], state}
 
-      not state.camera_open and state.retries == @max_retries ->
-        raise "Max retries exceeded, camera failed to open, exit status: #{exit_status}"
+      state.camera_open ->
+        raise "#{@app_name} error, exit status: #{exit_status}"
 
-      not state.camera_open ->
+      state.retries < @max_retries ->
         Port.close(port)
         Membrane.Logger.warning("Camera failed to open with exit status #{exit_status}, retrying")
         Process.sleep(50)
@@ -85,7 +96,7 @@ defmodule Membrane.Rpicam.Source do
         {[], %{state | retries: state.retries + 1, app_port: new_port}}
 
       true ->
-        raise "#{@app_name} error, exit status: #{exit_status}"
+        raise "Max retries exceeded, camera failed to open, exit status: #{exit_status}"
     end
   end
 
