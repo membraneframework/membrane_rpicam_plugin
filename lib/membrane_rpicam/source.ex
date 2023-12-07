@@ -55,7 +55,7 @@ defmodule Membrane.Rpicam.Source do
 
   @impl true
   def handle_init(_ctx, options) do
-    Process.sleep(Membrane.Time.as_millisecods(options.camera_open_delay, :round))
+    Process.sleep(Membrane.Time.as_milliseconds(options.camera_open_delay, :round))
 
     stream_format = %RemoteStream{type: :bytestream, content_format: H264}
 
