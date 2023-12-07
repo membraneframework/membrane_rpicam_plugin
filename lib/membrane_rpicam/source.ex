@@ -45,6 +45,7 @@ defmodule Membrane.Rpicam.Source do
               camera_open_delay: [
                 spec: Membrane.Time.non_neg(),
                 default: Membrane.Time.milliseconds(50),
+                inspector: &Membrane.Time.pretty_duration/1,
                 description: """
                 Determines for how long initial opening the camera should be delayed.
                 No delay can cause a crash on Nerves system when initalizing the
