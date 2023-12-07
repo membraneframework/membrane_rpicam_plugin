@@ -5,8 +5,10 @@ defmodule Membrane.Rpicam.Source do
 
   use Membrane.Source
   alias Membrane.{Buffer, H264, RemoteStream}
+  require Membrane.Logger
 
   @app_name "libcamera-vid"
+  @max_retries 3
 
   def_output_pad :output,
     accepted_format: %RemoteStream{type: :bytestream, content_format: H264},
@@ -39,15 +41,33 @@ defmodule Membrane.Rpicam.Source do
                 description: """
                 Output image height.
                 """
+              ],
+              camera_open_delay: [
+                spec: Membrane.Time.non_neg(),
+                default: Membrane.Time.milliseconds(50),
+                inspector: &Membrane.Time.pretty_duration/1,
+                description: """
+                Determines for how long initial opening the camera should be delayed.
+                No delay can cause a crash on Nerves system when initalizing the
+                element during the boot sequence of the device.
+                """
               ]
 
   @impl true
-  def handle_playing(_ctx, state) do
+  def handle_init(_ctx, options) do
+    Process.sleep(Membrane.Time.as_milliseconds(options.camera_open_delay, :round))
+
     stream_format = %RemoteStream{type: :bytestream, content_format: H264}
 
-    port = Port.open({:spawn, create_command(state)}, [:binary, :exit_status])
+    state = %{
+      app_port: open_port(options),
+      init_time: nil,
+      camera_open: false,
+      retries: 0,
+      options: options
+    }
 
-    {[stream_format: {:output, stream_format}], %{app_port: port, init_time: nil}}
+    {[stream_format: {:output, stream_format}], state}
   end
 
   @impl true
@@ -57,16 +77,33 @@ defmodule Membrane.Rpicam.Source do
 
     buffer = %Buffer{payload: data, pts: time - init_time}
 
-    {[buffer: {:output, buffer}], %{state | init_time: init_time}}
+    {[buffer: {:output, buffer}], %{state | init_time: init_time, camera_open: true}}
   end
 
   @impl true
   def handle_info({port, {:exit_status, exit_status}}, _ctx, %{app_port: port} = state) do
-    if exit_status == 0 do
-      {[end_of_stream: :output], state}
-    else
-      raise "#{@app_name} error, exit status: #{exit_status}"
+    cond do
+      exit_status == 0 ->
+        {[end_of_stream: :output], state}
+
+      state.camera_open ->
+        raise "#{@app_name} error, exit status: #{exit_status}"
+
+      state.retries < @max_retries ->
+        Port.close(port)
+        Membrane.Logger.warning("Camera failed to open with exit status #{exit_status}, retrying")
+        Process.sleep(50)
+        new_port = open_port(state.options)
+        {[], %{state | retries: state.retries + 1, app_port: new_port}}
+
+      true ->
+        raise "Max retries exceeded, camera failed to open, exit status: #{exit_status}"
     end
+  end
+
+  @spec open_port(Membrane.Rpicam.Source.t()) :: port()
+  defp open_port(options) do
+    Port.open({:spawn, create_command(options)}, [:binary, :exit_status])
   end
 
   @spec create_command(Membrane.Element.options()) :: String.t()
@@ -86,6 +123,7 @@ defmodule Membrane.Rpicam.Source do
     "#{@app_name} -t #{timeout} --framerate #{framerate_float} --width #{width} --height #{height} -o -"
   end
 
+  @spec resolve_defaultable_option(:camera_default | x, x) :: x when x: var
   defp resolve_defaultable_option(option, default) do
     case option do
       :camera_default -> default
