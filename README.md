@@ -13,7 +13,7 @@ The package can be installed by adding `membrane_rpicam_plugin` to your list of 
 ```elixir
 def deps do
   [
-    {:membrane_rpicam_plugin, "~> 0.1.1"}
+    {:membrane_rpicam_plugin, "~> 0.1.2"}
   ]
 end
 ```
