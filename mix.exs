@@ -1,4 +1,4 @@
-defmodule MembraneRpicamPlugin.MixProject do
+defmodule Membrane.Rpicam.Plugin.MixProject do
   use Mix.Project
 
   @version "0.1.3"
