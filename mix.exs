@@ -1,8 +1,8 @@
-defmodule MembraneRpicamPlugin.MixProject do
+defmodule Membrane.Rpicam.Plugin.MixProject do
   use Mix.Project
 
-  @version "0.1.2"
-  @github_url "https://github.com/membraneframework-labs/membrane_rpicam_plugin"
+  @version "0.1.3"
+  @github_url "https://github.com/membraneframework/membrane_rpicam_plugin"
 
   def project do
     [
