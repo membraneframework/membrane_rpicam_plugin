@@ -93,7 +93,6 @@ defmodule Membrane.Rpicam.Source do
         raise "#{@app_name} error, exit status: #{exit_status}"
 
       state.retries < @max_retries ->
-        Port.close(port)
         Membrane.Logger.warning("Camera failed to open with exit status #{exit_status}, retrying")
         Process.sleep(50)
         new_port = open_port(state.options)
