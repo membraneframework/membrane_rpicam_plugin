@@ -60,6 +60,7 @@ defmodule Membrane.Rpicam.Source do
     state = %{
       app_port: nil,
       init_time: nil,
+      camera_open: false,
       retries: 0,
       options: options
     }
