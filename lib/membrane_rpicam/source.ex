@@ -53,7 +53,7 @@ defmodule Membrane.Rpicam.Source do
                 """
               ],
               camera: [
-                spec: pos_integer(),
+                spec: non_neg_integer(),
                 default: 0,
                 description: """
                 Which camera to use when multiple cameras are supported.
