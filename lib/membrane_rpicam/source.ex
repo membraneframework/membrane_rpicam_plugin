@@ -51,6 +51,13 @@ defmodule Membrane.Rpicam.Source do
                 No delay can cause a crash on Nerves system when initalizing the
                 element during the boot sequence of the device.
                 """
+              ],
+              camera: [
+                spec: non_neg_integer(),
+                default: 0,
+                description: """
+                Which camera to use when multiple cameras are supported.
+                """
               ]
 
   @impl true
@@ -123,7 +130,7 @@ defmodule Membrane.Rpicam.Source do
     width = resolve_defaultable_option(opts.width, 0)
     height = resolve_defaultable_option(opts.height, 0)
 
-    "#{@app_name} -t #{timeout} --framerate #{framerate_float} --width #{width} --height #{height} -o -"
+    "#{@app_name} -t #{timeout} --camera #{opts.camera} --framerate #{framerate_float} --width #{width} --height #{height} -o -"
   end
 
   @spec resolve_defaultable_option(:camera_default | x, x) :: x when x: var
