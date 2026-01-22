@@ -13,7 +13,7 @@ The package can be installed by adding `membrane_rpicam_plugin` to your list of 
 ```elixir
 def deps do
   [
-    {:membrane_rpicam_plugin, "~> 0.1.5"}
+    {:membrane_rpicam_plugin, "~> 0.1.6"}
   ]
 end
 ```
@@ -66,3 +66,4 @@ Copyright 2022, [Software Mansion](https://swmansion.com/?utm_source=git&utm_med
 [![Software Mansion](https://logo.swmansion.com/logo?color=white&variant=desktop&width=200&tag=membrane-github)](https://swmansion.com/?utm_source=git&utm_medium=readme&utm_campaign=membrane_rpicam_plugin)
 
 Licensed under the [Apache License, Version 2.0](LICENSE)
+
