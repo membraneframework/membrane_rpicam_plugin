@@ -41,7 +41,7 @@ defmodule Membrane.Rpicam.Plugin.MixProject do
       {:membrane_core, "~> 1.0"},
       {:membrane_h264_format, "~> 0.6.0"},
       {:bunch, "~> 1.4"},
-      {:ex_doc, "~> 0.40", only: :dev, runtime: false},
+      {:ex_doc, ">= 0.40.0", only: :dev, runtime: false},
       {:dialyxir, ">= 0.0.0", only: :dev, runtime: false},
       {:credo, ">= 0.0.0", only: :dev, runtime: false},
       {:membrane_file_plugin, "~> 0.16.0", only: :test}
